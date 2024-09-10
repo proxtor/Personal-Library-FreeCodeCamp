@@ -1,4 +1,6 @@
+
 "use strict";
+const mongoose = require("mongoose");
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -15,7 +17,8 @@ const app = express();
 app.use("/public", express.static(process.cwd() + "/public"));
 
 app.use(cors({ origin: "*" })); //USED FOR FCC TESTING PURPOSES ONLY!
-
+app.use(express.json()); // Парсинг JSON
+app.use(express.urlencoded({ extended: true })); // Парсинг URL-кодированных данных
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
