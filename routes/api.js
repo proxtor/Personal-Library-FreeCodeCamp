@@ -10,27 +10,24 @@
 const Book = require("../models").Book;
 
 module.exports = function (app) {
-  app
-    .route("/api/books")
-    .get(function (req, res) {
-      console.log("req.body :>> ", req.body);
-      //response will be array of book objects
-      //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
-      Book.find({}, (err, data) => {
-        if (!data) {
-          res.json([]);
-        } else {
-          const formatData = data.map((book) => {
-            return {
-              _id: book._id,
-              title: book.title,
-              comments: book.comments,
-              commentcount: book.comments.length,
-            };
-          });
-          res.json(formatData);
-        }
-      });
+  app.route("/api/books")
+  .get(function (req, res) {
+    Book.find({}, (err, data) => {
+      if (err) {
+        res.status(500).send("error");
+        return;
+      }
+      if (!data) {
+        res.json([]);
+      } else {
+        const formattedData = data.map((book) => ({
+          _id: book._id,
+          title: book.title,
+          commentcount: book.comments ? book.comments.length : 0// Убедитесь, что commentcount правильно обрабатывается
+        }));
+        res.json(formattedData);
+      }
+     });
     })
 
     .post(function (req, res) {
@@ -51,8 +48,7 @@ module.exports = function (app) {
     })
 
     .delete(function (req, res) {
-      //if successful response will be 'complete delete successful'
-      Book.remove({}, (err, data) => {
+      Book.deleteMany({}, (err, data) => { // Заменено на deleteMany
         if (err || !data) {
           res.send("error");
         } else {
